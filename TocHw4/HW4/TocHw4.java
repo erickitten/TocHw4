@@ -52,10 +52,11 @@ public class TocHw4 {
 					if(theMap.containsKey(groupStr)){
 						InfoEntry currentInfo = theMap.get(groupStr);
 						currentInfo.updatePrice(current.getInt("總價元"));
-						currentInfo.updateDistinctMonth(current.getString("交易年月"));
+						currentInfo.updateDistinctMonth(
+								Integer.toString(current.getInt("交易年月")));
 					}else{//not mapped yet
-						theMap.put(groupStr, 
-								new InfoEntry(current.getInt("總價元"),current.getString("交易年月")));
+						theMap.put(groupStr,new InfoEntry(current.getInt("總價元"),
+								Integer.toString(current.getInt("交易年月"))));
 					}
 				}
 			} catch (JSONException e) {
