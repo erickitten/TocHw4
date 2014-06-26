@@ -1,14 +1,20 @@
 
+/**
+ * Project : TocHw4
+ * Author : 乎
+ * Author_ID : AN4006048
+*/
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.*;
 import java.util.regex.*;
-
 import org.json.*;
 
-
-public class TocHw4 {
-	
+/**
+ * args :
+ * [0] source JSON URL
+*/
+public class TocHw4 {	
 
 	public static void main(String[] args) {
 		JSONArray sourceArray = null;
@@ -18,8 +24,7 @@ public class TocHw4 {
 			System.out.println("incorrect arguments length ,system will exit");
 			System.exit(0);
 		}
-		
-		
+				
 		try {//retrieve JSON data array
 			URL url = new URL(args[0]);
 			//due to encoding issue ,just use url.openStream() will result in error
@@ -35,6 +40,7 @@ public class TocHw4 {
 		//+? matches shortest ,when (__隔__) happens ,it would only match (__隔)
 		
 		theMap = new HashMap<String,InfoEntry>();
+		//check each entry max_price ,min_price ,#distinct_month
 		for(int i=0;i<sourceArray.length();i++){
 			//for each JSONObject in array
 			JSONObject current;
@@ -42,23 +48,40 @@ public class TocHw4 {
 				current = sourceArray.getJSONObject(i);
 				Matcher m = pattern.matcher(current.getString("跋琿竚┪跋礟"));
 				if(m.find()){
-					String groupStr = m.group();
-					
+					String groupStr = m.group();					
 					if(theMap.containsKey(groupStr)){
 						InfoEntry currentInfo = theMap.get(groupStr);
 						currentInfo.updatePrice(current.getInt("羆基じ"));
 						currentInfo.updateDistinctMonth(current.getString("ユる"));
-					}else{
+					}else{//not mapped yet
 						theMap.put(groupStr, 
 								new InfoEntry(current.getInt("羆基じ"),current.getString("ユる")));
 					}
-				}			
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 				System.exit(0);
-			}	
+			}
 		}
-
+		
+		int maxNumberOfDistinctMonth = 0;
+		List<String> maxKey = new ArrayList<String>();
+		//iterate through map ,find max #distinct_month and it's road
+		for(Map.Entry<String,InfoEntry> entry : theMap.entrySet()){
+			if(entry.getValue().getNumberOfDistinctMonth() > maxNumberOfDistinctMonth){
+				maxNumberOfDistinctMonth = entry.getValue().getNumberOfDistinctMonth();
+				maxKey.clear();
+				maxKey.add(entry.getKey());
+			}else if(entry.getValue().getNumberOfDistinctMonth() == maxNumberOfDistinctMonth){
+				maxKey.add(entry.getKey());
+			}
+		}
+		
+		for(int i=0;i<maxKey.size();i++){
+			String currentKey = maxKey.get(i);
+			InfoEntry currentEntry = theMap.get(currentKey);
+			System.out.println(currentKey + ", 程蔼Θユ基" + currentEntry.getMaxPrice()
+					+ ", 程Θユ基" + currentEntry.getMinPrice());
+		}
 	}
-
 }
